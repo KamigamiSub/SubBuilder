@@ -1,0 +1,9 @@
+GEM
+  specs:
+    colorize (0.7.5)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  colorize
