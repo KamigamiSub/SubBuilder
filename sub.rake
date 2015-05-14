@@ -6,6 +6,7 @@ HEADER_STYLE = '[V4+ Styles]'
 HEADER_EVENT = '[Events]'
 DATA_STYLE = 'Style:'
 DATA_EVENT = 'Dialogue:'
+DATA_COMMENT = 'Comment:'
 SEPARATOR = "; --- ;\n"
 
 name = $name
@@ -38,7 +39,26 @@ task :default => targets
 task :touch do
   mkdir "src/#{eps}" unless File.exists? "src/#{eps}"
   ['chs.meta.ass', 'chs.oped.ass', 'chs.text.ass', 'cht.meta.ass', 'cht.oped.ass', 'cht.text.ass', 'jpn.oped.ass', 'jpn.text.ass'].each do |f|
-    touch "src/#{eps}/#{f}"
+    target = "src/#{eps}/#{f}"
+    next if File.exists? target
+    cp "src/empty.ass", target
+    source = case f
+      when /chs/ then '简日'
+      when /cht/ then '繁日'
+      when /jpn/ then '日文'
+    end
+    keys = case f
+      when /jpn\.oped/ then /(,| )(OP|ED) JP,/
+      when /jpn\.text/ then /(,| )TEXT JP/
+      when /oped/ then /(,| )(OP|ED) CN,/
+      when /text/ then /(,| )(TEXT CN|TITLE|OTHERS|NOTES)/
+      when /meta/ then /(,| )STATE,/
+    end
+    file = Dir["src/#{eps}/*#{source}*.ass"].first
+    next if file.nil?
+    puts " + Inserting content".cyan
+    lines = File.readlines(file).select{|l| l[keys]}
+    File.open(target, 'a') {|f| f << lines.join}
   end
 end
 
@@ -63,7 +83,7 @@ def merge_sub files
   # Events
   layout.delete "\n"
   ass_file += layout
-  events_data = file_data.map { |f| f.select { |l| l.start_with? DATA_EVENT } + [SEPARATOR] }
+  events_data = file_data.map { |f| f.select { |l| l.start_with?(DATA_EVENT) || l.start_with?(DATA_COMMENT) } + [SEPARATOR] }
   events_data.flatten!
   ass_file += events_data
   ass_file.join
