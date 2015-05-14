@@ -51,8 +51,8 @@ task :touch do
       when /jpn\.oped/ then /(,| )(OP|ED) JP,/
       when /jpn\.text/ then /(,| )TEXT JP/
       when /oped/ then /(,| )(OP|ED) CN,/
-      when /text/ then /(,| )(TEXT CN|TITLE|OTHERS|NOTES)/
-      when /meta/ then /(,| )STATE,/
+      when /text/ then /(,| )(TEXT CN|TITLE|OTHERS|NOTES|ENG)/
+      when /meta/ then /(,| )(STATE|STAFF),/
     end
     file = Dir["src/#{eps}/*#{source}*.ass"].first
     next if file.nil?
