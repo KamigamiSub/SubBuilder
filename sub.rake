@@ -48,17 +48,44 @@ task :touch do
       when /jpn/ then '日文'
     end
     keys = case f
-      when /jpn\.oped/ then /(,| )(OP|ED) JP,/
-      when /jpn\.text/ then /(,| )TEXT JP/
-      when /oped/ then /(,| )(OP|ED) CN,/
-      when /text/ then /(,| )(TEXT CN|TITLE|OTHERS|NOTES|ENG)/
-      when /meta/ then /(,| )(STATE|STAFF),/
+      when /jpn\.oped/ 
+        /(,| )(OP|ED) JP,/
+      when /jpn\.text/ 
+        /(,| )TEXT JP/
+      when /oped/ 
+        /(,| )(OP|ED) CN,/
+      when /text/ 
+        /(,| )(TEXT CN|TITLE|OTHERS|NOTES|ENG)/
+      when /meta/ 
+        /(,| )STATE|STAFF,/
     end
     file = Dir["src/#{eps}/*#{source}*.ass"].first
     next if file.nil?
     puts " + Inserting content".cyan
     lines = File.readlines(file).select{|l| l[keys]}
     File.open(target, 'a') {|f| f << lines.join}
+  end
+end
+
+task :check do
+  require 'differ'
+  require 'ropencc'
+
+  [['chs.meta.ass', 'cht.meta.ass'], ['chs.oped.ass', 'cht.oped.ass'], ['chs.text.ass', 'cht.text.ass']].each do |f|
+    puts f.join(" <=> ").cyan
+    target = f.map {|fn| "src/#{eps}/#{fn}"}
+    size = target.map {|fn| File.size fn}
+    content = target.map {|fn| File.readlines fn}
+    lines = content.map(&:size)
+    linelens = content.map {|c| c.map &:size}
+    puts ("Lines: " + lines.join(" <=> ")).cyan if lines.max != lines.min
+    minline = lines.min
+    1.upto(minline) do |ln|
+      lens = linelens.map {|l| l[ln-1]}
+      puts ("Line #{ln}: " + lens.join(" <=> ")).red if lens.max != lens.min
+      text = content.map {|c| Ropencc.conv('s2tw.json', c[ln-1]).chomp}
+      puts "Line #{ln}:\n".blue + Differ.diff_by_char(text[0], text[1]).to_s + "\n" if text.first != text.last
+    end
   end
 end
 
@@ -74,14 +101,14 @@ def merge_sub files
   # Styles
   styles = layout.take_while { |l| ! l.start_with? HEADER_EVENT }
   layout = layout.drop styles.size
-  styles.delete "\n"
+  styles.delete_if {|s| s.chomp.empty?}
   ass_file += styles
   styles_data = file_data.map { |f| f.select { |l| l.start_with? DATA_STYLE } }
   styles_data.flatten!
   styles_data = dedup styles_data
   ass_file += styles_data << "\n"
   # Events
-  layout.delete "\n"
+  layout.delete_if {|s| s.chomp.empty?}
   ass_file += layout
   events_data = file_data.map { |f| f.select { |l| l.start_with?(DATA_EVENT) || l.start_with?(DATA_COMMENT) } + [SEPARATOR] }
   events_data.flatten!

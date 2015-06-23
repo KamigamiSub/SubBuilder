@@ -1,9 +1,18 @@
 GEM
+  remote: https://rubygems.org/
   specs:
     colorize (0.7.5)
+    differ (0.1.2)
+    ffi (1.9.8)
+    ffi (1.9.8-x64-mingw32)
+    ropencc (0.0.6)
+      ffi (~> 1.0)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
   colorize
+  differ
+  ropencc
