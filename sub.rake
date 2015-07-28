@@ -16,7 +16,7 @@ raise 'Usage: rake eps=## [touch]' if eps.nil?
 type = ['chs', 'cht', 'jpn']
 targets = []
 type.each do |t|
-  target = "dist/#{name} #{eps}.#{t}.ass"
+  target = "dist/#{name} #{eps.gsub('/', ' ')}.#{t}.ass"
   targets << target
   files = ['layout/all.ass'] +
           Dir["layout/#{t}.ass"] +
@@ -49,13 +49,13 @@ task :touch do
     end
     keys = case f
       when /jpn\.oped/ 
-        /(,| )(OP|ED) JP,/
+        /(,| )(OP|ED)[- ]JP,/
       when /jpn\.text/ 
-        /(,| )TEXT JP/
+        /(,| )TEXT[- ]JP/
       when /oped/ 
-        /(,| )(OP|ED) CN,/
+        /(,| )(OP|ED)[- ]CN,/
       when /text/ 
-        /(,| )(TEXT CN|TITLE|OTHERS|NOTES|ENG)/
+        /(,| )(TEXT[- ]CN|TITLE|OTHERS|NOTES|ENG)/
       when /meta/ 
         /(,| )STATE|STAFF,/
     end
