@@ -74,11 +74,15 @@ task :check do
   [['chs.meta.ass', 'cht.meta.ass'], ['chs.oped.ass', 'cht.oped.ass'], ['chs.text.ass', 'cht.text.ass']].each do |f|
     puts f.join(" <=> ").cyan
     target = f.map {|fn| "src/#{eps}/#{fn}"}
-    size = target.map {|fn| File.size fn}
+    size = target.map {|fn| File.size fn} rescue nil
+    if size.nil?
+      puts 'WARNING: FILES ARE MISSING.'.red
+      next
+    end
     content = target.map {|fn| File.readlines fn}
     lines = content.map(&:size)
     linelens = content.map {|c| c.map &:size}
-    puts ("Lines: " + lines.join(" <=> ")).cyan if lines.max != lines.min
+    puts ("Lines: " + lines.join(" <=> ")).red if lines.max != lines.min
     minline = lines.min
     1.upto(minline) do |ln|
       lens = linelens.map {|l| l[ln-1]}
