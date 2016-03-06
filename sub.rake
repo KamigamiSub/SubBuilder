@@ -11,7 +11,7 @@ SEPARATOR = "; --- ;\n"
 
 name = $name
 eps = ENV['eps']
-raise 'Usage: rake eps=## [touch]' if eps.nil?
+raise 'Usage: rake eps=## [touch] [check]' if eps.nil?
 
 type = ['chs', 'cht', 'jpn']
 targets = []
