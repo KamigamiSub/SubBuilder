@@ -121,14 +121,19 @@ def merge_sub files
 end
 
 def dedup styles
-  st = Hash.new 0
+  st = Hash.new nil
   styles.select do |s|
     s_n = s.split(':').last.split(',').first.strip
-    if st[s_n] == 1
-      puts "  # Skip ( #{s.chomp} )"
+    if st[s_n]
+      puts "  \#  Skip  ( #{s.strip} )"
+      if st[s_n] != s.strip
+        puts "   Because ( #{st[s_n]} )".red
+      else
+        puts "  \# Duplicate".cyan
+      end
       next false
     end
-    st[s_n] = 1
+    st[s_n] = s.strip
     true
   end
 end
