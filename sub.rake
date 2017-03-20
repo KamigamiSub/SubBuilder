@@ -63,7 +63,16 @@ task :touch do
     next if file.nil?
     puts " + Inserting content".cyan
     lines = File.readlines(file).select{|l| l[keys]}
-    File.open(target, 'a') {|f| f << lines.join}
+    ass = File.read(target)
+    head, body = ass.split('[Events]', 2)
+    styles, dialogs = lines.partition{ |l| l.start_with?('Style:') }
+    File.open(target, 'w') do |f|
+      f.puts head.strip
+      f.puts styles
+      f.puts "\n[Events]"
+      f.puts body.strip
+      f.puts dialogs
+    end
   end
 end
 
