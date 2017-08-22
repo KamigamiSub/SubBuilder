@@ -21,8 +21,8 @@ type.each do |t|
   files = ['layout/all.ass'] +
           Dir["layout/#{t}.ass"] +
           Dir["src/#{eps}/all.*.ass"] +
-          Dir["src/#{eps}/jpn.*.ass"] +
-          Dir["src/#{eps}/#{t}.*.ass"]
+          Dir["src/#{eps}/#{t}.*.ass"] +
+          Dir["src/#{eps}/jpn.*.ass"]
   files << Dir["src/#{eps}/*.meta.ass"].first if t == 'jpn'
   files.compact!
   files.uniq!
